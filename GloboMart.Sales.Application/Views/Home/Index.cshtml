@@ -1,0 +1,134 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <hgroup class="title">
+                <h1>@ViewBag.Title.</h1>
+                <h2>@ViewBag.Message</h2>
+            </hgroup>
+            <div>
+                <table><tr>
+                        <td><button onclick="GetAllProducts();return false;">Get All Products</button></td>
+                        <td>Enter Product Id: <input type="text" id="txtProductid" style="width:50PX"/></td>
+                        <td><button onclick="GetProduct();return false;">Get Product</button></td>
+                    <td>
+                        <table>
+                            <tr><td>Product Id:</td><td><input type="text" id="txtaddProdid" /></td></tr>
+                            <tr>  <td>Product Name:</td><td><input type="text" id="txtaddProdName" /></td></tr>
+                            <tr> <td>Product Type:</td><td><input type="text" id="txtaddProdType" /></td></tr>                            
+                        </table>
+                    </td>
+                        <td><button onclick="AddProduct();return false;">Add Product</button></td>
+                    <td>Delete Product <input type="text" id="txtdelProdId" style="width:50PX"/></td>
+                        <td><button onclick="DeleteProduct(); return false;">Delete Product</button></td>
+                       </tr></table>
+                
+            </div>
+        </div>
+
+    </section>
+}
+<h3>Oputput of action done through WEB API:</h3>
+<ol class="round">
+    <li>
+        <div id="divResult"></div>
+
+    </li>
+</ol>
+<script src="../../Scripts/jquery-1.7.1.min.js" type="text/javascript"></script>
+<script src="../../Scripts/jquery-1.7.1.js" type="text/javascript"></script>
+<script type="text/javascript">
+    function GetAllProducts() {
+        jQuery.support.cors = true;
+        $.ajax({
+            url: 'http://localhost:8347/api/ProductAPI',
+            type: 'GET',
+            dataType: 'json',            
+            crossDomain: true,
+            success: function (responseData, textStatus, jqXHR) {
+                WriteResponse(data);
+            },
+            error: function (responseData, textStatus, errorThrown)  {
+                alert('POST failed.');
+            }
+        });
+    }
+
+    function AddProduct() {
+        jQuery.support.cors = true;
+        var product = {
+            ProdId: $('#txtaddProdid').val(),
+            ProdName: $('#txtaddProdName').val(),
+            ProdType: $('#txtaddProdType').val(),            
+        };
+
+        $.ajax({
+            url: 'http://localhost:8347/api/ProductAPI',
+            type: 'POST',
+            data: JSON.stringify(product),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                WriteResponse(data);
+            },
+            error: function (x, y, z) {
+                alert(x + '\n' + y + '\n' + z);
+            }
+        });
+    }
+
+    function DeleteProduct() {
+        jQuery.support.cors = true;
+        var id = $('#txtdelProdId').val()
+
+        $.ajax({
+            url: 'http://localhost:8347/api/ProductAPI/' + id,
+            type: 'DELETE',
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                WriteResponse(data);
+            },
+            error: function (x, y, z) {
+                alert(x + '\n' + y + '\n' + z);
+            }
+        });
+    }
+
+    function WriteResponse(products) {
+        var strResult = "<table><th>ProdID</th><th>Prod Name</th><th>Prod Type</th>";
+        $.each(products, function (index, product) {
+            strResult += "<tr><td>" + product.ID + "</td><td> " + product.ProdName + "</td><td>" + product.ProdType + "</td></tr>";
+        });
+        strResult += "</table>";
+        $("#divResult").html(strResult);
+    }
+
+    function ShowEmployee(product) {
+        if (product != null) {
+            var strResult = "<table><th>ProdID</th><th>Prod Name</th><th>Prod Type</th>";
+            strResult += "<tr><td>" + product.ID + "</td><td> " + product.ProdName + "</td><td>" + product.ProdType + "</td></tr>";
+            strResult += "</table>";
+            $("#divResult").html(strResult);
+        }
+        else {
+            $("#divResult").html("No Results To Display");
+        }
+    }
+
+    function GetProduct() {
+        jQuery.support.cors = true;
+        var id = $('#txtProdid').val();
+        $.ajax({
+            url: 'http://localhost:8347/api/ProductAPI/' + id,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                ShowEmployee(data);
+            },
+            error: function (x, y, z) {
+                alert(x + '\n' + y + '\n' + z);
+            }
+        });
+    }
+</script>
